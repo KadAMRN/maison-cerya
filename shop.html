@@ -165,8 +165,8 @@
       <div class="container">
         <!-- Filters & Sort -->
         <div class="shop-controls">
-          <span class="shop-count" id="shopCount">8 produits</span>
-          <div class="shop-filters">
+          <span class="shop-count" id="shopCount">Chargement...</span>
+          <div class="shop-filters" id="shopFilters">
             <button
               class="filter-btn active"
               data-category="all"
@@ -174,27 +174,7 @@
             >
               Tout
             </button>
-            <button
-              class="filter-btn"
-              data-category="robes"
-              onclick="filterProducts('robes')"
-            >
-              Robes
-            </button>
-            <button
-              class="filter-btn"
-              data-category="ensembles"
-              onclick="filterProducts('ensembles')"
-            >
-              Ensembles
-            </button>
-            <button
-              class="filter-btn"
-              data-category="accessoires"
-              onclick="filterProducts('accessoires')"
-            >
-              Accessoires
-            </button>
+            <!-- Category filters loaded dynamically from Shopify -->
             <select class="sort-select" onchange="sortProducts(this.value)">
               <option value="">Trier par</option>
               <option value="price-asc">Prix croissant</option>
@@ -275,10 +255,8 @@
           </div>
           <div class="footer-col">
             <h4>Boutique</h4>
-            <ul>
-              <li><a href="shop.html?category=robes">Robes</a></li>
-              <li><a href="shop.html?category=ensembles">Ensembles</a></li>
-              <li><a href="shop.html?category=accessoires">Accessoires</a></li>
+            <ul class="footer-categories">
+              <li><a href="shop.html">Toute la collection</a></li>
             </ul>
           </div>
           <div class="footer-col">
