@@ -150,15 +150,17 @@ Dans **Paramètres** → **Expédition et livraison** :
 
 ```
 Maison Cerya site/
-├── index.html          # Page d'accueil
+├── index.html          # Page d'accueil (landing page immersive)
 ├── shop.html           # Page boutique (catalogue)
 ├── product.html        # Page détail produit
-├── about.html          # Page "Notre Histoire"
+├── collections.html    # Page collections thématiques
+├── about.html          # Page "À propos"
 ├── contact.html        # Page contact
 ├── css/
 │   └── style.css       # Styles globaux
 ├── js/
-│   └── app.js          # JavaScript + Shopify integration
+│   └── app.js          # JavaScript + Shopify integration + collections
+├── README.md           # Guide complet du site
 └── SHOPIFY-SETUP.md    # Ce guide
 ```
 

@@ -130,7 +130,7 @@
   // ============================================
   document.addEventListener("DOMContentLoaded", () => {
     initNavbar();
-    initMobileMenu();
+    initSidebar();
     initSearch();
     initCart();
     initAnimations();
@@ -165,8 +165,62 @@
         checkout = newCheckout;
       });
 
-      // Fetch products
-      shopifyClient.product.fetchAll().then(function (products) {
+      // Fetch product tags via direct Storefront API (Buy SDK omits tags)
+      function fetchProductTags() {
+        return fetch(
+          "https://" +
+            SHOPIFY_CONFIG.domain +
+            "/api/2024-01/graphql.json",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Shopify-Storefront-Access-Token":
+                SHOPIFY_CONFIG.storefrontAccessToken,
+            },
+            body: JSON.stringify({
+              query:
+                "{ products(first: 250) { edges { node { id tags } } } }",
+            }),
+          },
+        )
+          .then(function (res) {
+            return res.json();
+          })
+          .then(function (data) {
+            var tagMap = {};
+            if (data && data.data && data.data.products) {
+              data.data.products.edges.forEach(function (edge) {
+                tagMap[edge.node.id] = edge.node.tags;
+              });
+            }
+            return tagMap;
+          })
+          .catch(function () {
+            return {};
+          });
+      }
+
+      // Fetch products + tags in parallel, then merge
+      Promise.all([
+        shopifyClient.product.fetchAll(),
+        fetchProductTags(),
+      ]).then(function (results) {
+        var products = results[0];
+        var tagMap = results[1];
+
+        // Attach tags from GraphQL onto SDK product objects
+        products.forEach(function (p) {
+          if (tagMap[p.id]) {
+            p.tags = tagMap[p.id];
+          }
+        });
+
+        console.log("[Maison Cerya] Products loaded:", products.length);
+        if (products.length > 0) {
+          console.log("[Maison Cerya] First product tags:", products[0].tags);
+        }
+
         window.shopifyProducts = products;
         loadPageProducts();
         // Re-init product detail if on product page
@@ -215,21 +269,69 @@
       updateShopCount(filtered.length);
     }
 
-    // Dynamic categories, filters, and footer
+    // Dynamic categories, filters, footer, and collections
     renderCategoryCards(products);
     renderShopFilters(products);
     renderFooterCategories(products);
+    renderSidebarCategories(products);
+    renderCollectionTeaser(products);
+    renderCollectionsPage(products);
+    renderFooterCollections(products);
+
+    // Pre-activate category filter from URL param
+    if (shopGrid) {
+      var urlCategory = new URLSearchParams(window.location.search).get(
+        "category",
+      );
+      if (urlCategory) {
+        document
+          .querySelectorAll("#shopFilters .filter-btn")
+          .forEach(function (btn) {
+            btn.classList.toggle(
+              "active",
+              btn.dataset.category === urlCategory,
+            );
+          });
+      }
+    }
   }
 
   function mapShopifyProduct(product) {
     var variant = product.variants[0];
+    // Parse collection tags (format: "collection:Name:status")
+    var collections = [];
+    var regularTags = [];
+    if (product.tags && product.tags.length > 0) {
+      product.tags.forEach(function (tag) {
+        if (tag.toLowerCase().startsWith("collection:")) {
+          var parts = tag.split(":");
+          if (parts.length >= 3) {
+            // Capitalize collection name (Shopify lowercases all tags)
+            var rawName = parts[1].trim();
+            var displayName = rawName
+              .split(" ")
+              .map(function (w) {
+                return w.charAt(0).toUpperCase() + w.slice(1);
+              })
+              .join(" ");
+            collections.push({
+              name: displayName,
+              status: parts[2].trim().toLowerCase(),
+            });
+          }
+        } else {
+          regularTags.push(tag);
+        }
+      });
+    }
     return {
       id: product.id,
       title: product.title,
       price: formatPrice(variant.price.amount),
       priceNum: parseFloat(variant.price.amount),
       category: product.productType ? product.productType.toLowerCase() : "",
-      badge: product.tags && product.tags.length > 0 ? product.tags[0] : null,
+      badge: regularTags.length > 0 ? regularTags[0] : null,
+      collections: collections,
       description: product.descriptionHtml || product.description,
       image: product.images.length > 0 ? product.images[0].src : null,
       images: product.images.map(function (img) {
@@ -423,6 +525,198 @@
     });
   }
 
+  function renderSidebarCategories(products) {
+    var containers = document.querySelectorAll("#sidebarCategories");
+    if (!containers.length) return;
+    var categories = getCategories(products);
+    var html = categories
+      .map(function (cat) {
+        return (
+          '<li><a href="shop.html?category=' +
+          encodeURIComponent(cat.name) +
+          '">' +
+          escapeHtml(cat.label) +
+          "</a></li>"
+        );
+      })
+      .join("");
+    html += '<li><a href="shop.html">Tout voir</a></li>';
+    containers.forEach(function (c) {
+      c.innerHTML = html;
+    });
+  }
+
+  // ============================================
+  // DYNAMIC COLLECTIONS (from Shopify tags)
+  // ============================================
+  function getCollections(products) {
+    var collMap = {};
+    products.forEach(function (p) {
+      (p.collections || []).forEach(function (col) {
+        var key = col.name.toLowerCase();
+        if (!collMap[key]) {
+          collMap[key] = {
+            name: col.name,
+            status: col.status,
+            image: p.image,
+            count: 0,
+            products: [],
+          };
+        }
+        collMap[key].count++;
+        collMap[key].products.push(p);
+      });
+    });
+    return Object.values(collMap);
+  }
+
+  // Homepage: elegant teaser linking to collections page
+  function renderCollectionTeaser(products) {
+    var container = document.getElementById("collectionsTeaser");
+    if (!container) return;
+    var collections = getCollections(products);
+    var active = collections.filter(function (c) {
+      return c.status === "active";
+    });
+    if (!active.length) {
+      container.closest(".collections-teaser") &&
+        (container.closest(".collections-teaser").style.display = "none");
+      return;
+    }
+    container.innerHTML = active
+      .map(function (col) {
+        return (
+          '<a href="collections.html#' +
+          encodeURIComponent(col.name.toLowerCase().replace(/\s+/g, "-")) +
+          '" class="collection-teaser-item">' +
+          '<span class="collection-teaser-name">' +
+          escapeHtml(col.name) +
+          "</span>" +
+          '<span class="collection-teaser-arrow">→</span>' +
+          "</a>"
+        );
+      })
+      .join("");
+  }
+
+  // Collections page: full editorial layout, each collection as a section
+  function renderCollectionsPage(products) {
+    var container = document.getElementById("collectionsPage");
+    if (!container) return;
+    var collections = getCollections(products);
+    var active = collections.filter(function (c) {
+      return c.status === "active";
+    });
+    var archived = collections.filter(function (c) {
+      return c.status === "archived";
+    });
+
+    if (!collections.length) {
+      container.innerHTML =
+        '<div class="container" style="padding:80px 24px;text-align:center;">' +
+        '<p style="font-size:0.9rem;color:var(--color-gray);">Aucune collection disponible pour le moment.</p>' +
+        "</div>";
+      return;
+    }
+
+    var html = "";
+
+    // Active collections — large editorial sections
+    active.forEach(function (col) {
+      var anchor = col.name.toLowerCase().replace(/\s+/g, "-");
+      html +=
+        '<section class="coll-section" id="' +
+        escapeHtml(anchor) +
+        '">' +
+        '<div class="coll-section-header">' +
+        '<h2 class="coll-section-title">' +
+        escapeHtml(col.name) +
+        "</h2>" +
+        '<span class="coll-section-count">' +
+        col.count +
+        " pièce" +
+        (col.count > 1 ? "s" : "") +
+        "</span>" +
+        "</div>" +
+        '<div class="container">' +
+        '<div class="coll-products-grid" id="coll-' +
+        escapeHtml(anchor) +
+        '">' +
+        "</div>" +
+        "</div>" +
+        "</section>";
+    });
+
+    // Archived collections — muted, smaller
+    if (archived.length) {
+      html +=
+        '<section class="coll-archived-section">' +
+        '<div class="container">' +
+        '<div class="coll-archived-header">' +
+        '<span class="section-tag">Archives</span>' +
+        '<h2 class="section-title">Collections Précédentes</h2>' +
+        "</div>";
+
+      archived.forEach(function (col) {
+        var anchor = col.name.toLowerCase().replace(/\s+/g, "-");
+        html +=
+          '<div class="coll-archived-group" id="' +
+          escapeHtml(anchor) +
+          '">' +
+          '<h3 class="coll-archived-name">' +
+          escapeHtml(col.name) +
+          '<span class="coll-archived-count">' +
+          col.count +
+          " pièce" +
+          (col.count > 1 ? "s" : "") +
+          "</span>" +
+          "</h3>" +
+          '<div class="coll-products-grid coll-products-grid--small" id="coll-' +
+          escapeHtml(anchor) +
+          '">' +
+          "</div>" +
+          "</div>";
+      });
+
+      html += "</div></section>";
+    }
+
+    container.innerHTML = html;
+
+    // Now render products into each collection grid
+    collections.forEach(function (col) {
+      var anchor = col.name.toLowerCase().replace(/\s+/g, "-");
+      var grid = document.getElementById("coll-" + anchor);
+      if (grid) {
+        renderProducts(grid, col.products);
+      }
+    });
+  }
+
+  function renderFooterCollections(products) {
+    var containers = document.querySelectorAll(".footer-collections");
+    if (!containers.length) return;
+    var collections = getCollections(products);
+    var active = collections.filter(function (c) {
+      return c.status === "active";
+    });
+    var html = active
+      .map(function (col) {
+        return (
+          '<li><a href="collections.html#' +
+          encodeURIComponent(col.name.toLowerCase().replace(/\s+/g, "-")) +
+          '">' +
+          escapeHtml(col.name) +
+          "</a></li>"
+        );
+      })
+      .join("");
+    html += '<li><a href="collections.html">Toutes les collections</a></li>';
+    containers.forEach(function (c) {
+      c.innerHTML = html;
+    });
+  }
+
   // ============================================
   // CART MANAGEMENT
   // ============================================
@@ -537,7 +831,7 @@
 
     if (cart.length === 0) {
       itemsEl.innerHTML =
-        '<div class="cart-empty"><p>Votre panier est vide</p><a href="shop.html" class="btn btn-primary">Découvrir la boutique</a></div>';
+        '<div class="cart-empty"><p>Votre panier est vide</p><a href="shop.html" class="btn btn-primary">Explorer la boutique</a></div>';
       footerEl.style.display = "none";
       return;
     }
@@ -667,20 +961,46 @@
   }
 
   // ============================================
-  // MOBILE MENU
+  // SIDEBAR NAVIGATION
   // ============================================
-  function initMobileMenu() {
+  function initSidebar() {
     var toggle = document.getElementById("menuToggle");
-    var menu = document.getElementById("mobileMenu");
+    var sidebar = document.getElementById("sidebarNav");
+    var overlay = document.getElementById("sidebarOverlay");
 
-    if (!toggle || !menu) return;
+    if (!toggle || !sidebar) return;
+
+    function openSidebar() {
+      toggle.classList.add("active");
+      sidebar.classList.add("active");
+      if (overlay) overlay.classList.add("active");
+      document.body.classList.add("sidebar-open");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeSidebar() {
+      toggle.classList.remove("active");
+      sidebar.classList.remove("active");
+      if (overlay) overlay.classList.remove("active");
+      document.body.classList.remove("sidebar-open");
+      document.body.style.overflow = "";
+    }
 
     toggle.addEventListener("click", function () {
-      toggle.classList.toggle("active");
-      menu.classList.toggle("active");
-      document.body.style.overflow = menu.classList.contains("active")
-        ? "hidden"
-        : "";
+      if (sidebar.classList.contains("active")) {
+        closeSidebar();
+      } else {
+        openSidebar();
+      }
+    });
+
+    if (overlay) {
+      overlay.addEventListener("click", closeSidebar);
+    }
+
+    // Close sidebar on link click
+    sidebar.querySelectorAll("a").forEach(function (link) {
+      link.addEventListener("click", closeSidebar);
     });
   }
 
@@ -766,7 +1086,7 @@
   // SHOP PAGE FILTERS
   // ============================================
   window.filterProducts = function (category) {
-    document.querySelectorAll(".filter-btn").forEach(function (btn) {
+    document.querySelectorAll("#shopFilters .filter-btn").forEach(function (btn) {
       btn.classList.toggle(
         "active",
         btn.dataset.category === category ||
@@ -799,7 +1119,7 @@
       ? window.shopifyProducts.map(mapShopifyProduct)
       : [];
 
-    var activeFilter = document.querySelector(".filter-btn.active");
+    var activeFilter = document.querySelector("#shopFilters .filter-btn.active");
     var category = activeFilter ? activeFilter.dataset.category : "all";
     if (category && category !== "all") {
       products = products.filter(function (p) {

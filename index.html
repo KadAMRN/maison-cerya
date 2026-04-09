@@ -17,15 +17,8 @@
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
-    <!-- Announcement Bar -->
-    <div class="announcement-bar">
-      <p>
-        Livraison disponible partout en Algérie — Nouvelle collection disponible
-      </p>
-    </div>
-
     <!-- Navigation -->
-    <nav class="navbar" id="navbar">
+    <nav class="navbar navbar--landing" id="navbar">
       <div class="nav-container">
         <button class="menu-toggle" id="menuToggle" aria-label="Menu">
           <span></span>
@@ -40,7 +33,7 @@
         <ul class="nav-links" id="navLinks">
           <li><a href="index.html" class="active">Accueil</a></li>
           <li><a href="shop.html">Boutique</a></li>
-          <li><a href="about.html">Notre Histoire</a></li>
+          <li><a href="collections.html">Collections</a></li>
           <li><a href="contact.html">Contact</a></li>
         </ul>
 
@@ -81,15 +74,24 @@
       </div>
     </nav>
 
-    <!-- Mobile Menu -->
-    <div class="mobile-menu" id="mobileMenu">
-      <ul>
-        <li><a href="index.html">Accueil</a></li>
-        <li><a href="shop.html">Boutique</a></li>
-        <li><a href="about.html">Notre Histoire</a></li>
-        <li><a href="contact.html">Contact</a></li>
-      </ul>
-    </div>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <nav class="sidebar-nav" id="sidebarNav">
+      <div class="sidebar-content">
+        <div class="sidebar-col sidebar-main-links">
+          <ul>
+            <li><a href="index.html">Accueil</a></li>
+            <li><a href="shop.html">Boutique</a></li>
+            <li><a href="collections.html">Collections</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div class="sidebar-col sidebar-shop-categories">
+          <h4>Catégories</h4>
+          <ul id="sidebarCategories"></ul>
+        </div>
+      </div>
+    </nav>
 
     <!-- Search Overlay -->
     <div class="search-overlay" id="searchOverlay">
@@ -138,7 +140,7 @@
       <div class="cart-items" id="cartItems">
         <div class="cart-empty">
           <p>Votre panier est vide</p>
-          <a href="shop.html" class="btn btn-primary">Découvrir la boutique</a>
+          <a href="shop.html" class="btn btn-primary">Explorer la boutique</a>
         </div>
       </div>
       <div class="cart-footer" id="cartFooter" style="display: none">
@@ -152,168 +154,22 @@
       </div>
     </div>
 
-    <!-- Hero Section -->
-    <section class="hero">
-      <div class="hero-content">
-        <span class="hero-subtitle fade-up">Collection 2026</span>
-        <h1 class="hero-title fade-up">L'Élégance<br />à l'Algérienne</h1>
-        <p class="hero-desc fade-up">
-          Des pièces raffinées qui célèbrent la femme moderne, entre héritage et
-          contemporain.
-        </p>
-        <a href="shop.html" class="btn btn-primary fade-up"
-          >Découvrir la collection</a
+    <!-- Landing Hero -->
+    <section class="landing-hero">
+      <div class="landing-hero-media">
+        <!-- Replace with your video: <video autoplay muted loop playsinline><source src="your-video.mp4" type="video/mp4"></video> -->
+        <div class="landing-hero-placeholder"></div>
+      </div>
+      <div class="landing-hero-overlay"></div>
+      <div class="landing-hero-content">
+        <h1 class="fade-up">MAISON CERYA</h1>
+        <a href="collections.html" class="btn btn-outline-light fade-up"
+          >Découvrez notre dernière collection</a
         >
       </div>
       <div class="hero-scroll">
         <span>Défiler</span>
         <div class="scroll-line"></div>
-      </div>
-    </section>
-
-    <!-- Featured Categories -->
-    <section class="categories section">
-      <div class="container">
-        <div class="section-header">
-          <span class="section-tag">Collections</span>
-          <h2 class="section-title">Nos Univers</h2>
-        </div>
-        <div class="categories-grid" id="categoriesGrid">
-          <!-- Categories loaded dynamically from Shopify -->
-        </div>
-      </div>
-    </section>
-
-    <!-- Featured Products -->
-    <section class="featured section">
-      <div class="container">
-        <div class="section-header">
-          <span class="section-tag">Sélection</span>
-          <h2 class="section-title">Pièces Phares</h2>
-        </div>
-        <div class="products-grid" id="featuredProducts">
-          <!-- Products loaded dynamically via Shopify or static fallback -->
-        </div>
-        <div class="section-cta">
-          <a href="shop.html" class="btn btn-outline"
-            >Voir toute la collection</a
-          >
-        </div>
-      </div>
-    </section>
-
-    <!-- Brand Story Banner -->
-    <section class="story-banner">
-      <div class="story-content">
-        <span class="section-tag">Notre Philosophie</span>
-        <h2>Tradition & Modernité</h2>
-        <p>
-          Maison Cerya puise son inspiration dans la richesse du patrimoine
-          algérien pour créer des pièces intemporelles. Chaque création est
-          pensée pour sublimer la femme d'aujourd'hui avec élégance et
-          raffinement.
-        </p>
-        <a href="about.html" class="btn btn-outline-light"
-          >Découvrir notre histoire</a
-        >
-      </div>
-    </section>
-
-    <!-- New Arrivals -->
-    <section class="new-arrivals section">
-      <div class="container">
-        <div class="section-header">
-          <span class="section-tag">Nouveautés</span>
-          <h2 class="section-title">Dernières Arrivées</h2>
-        </div>
-        <div class="products-grid" id="newArrivals">
-          <!-- Products loaded dynamically -->
-        </div>
-      </div>
-    </section>
-
-    <!-- Instagram Feed -->
-    <section class="instagram section">
-      <div class="container">
-        <div class="section-header">
-          <span class="section-tag">@maison.cerya</span>
-          <h2 class="section-title">Suivez-nous sur Instagram</h2>
-        </div>
-        <div class="instagram-grid">
-          <a
-            href="https://www.instagram.com/maison.cerya/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="insta-item"
-          >
-            <div class="insta-placeholder"></div>
-          </a>
-          <a
-            href="https://www.instagram.com/maison.cerya/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="insta-item"
-          >
-            <div class="insta-placeholder"></div>
-          </a>
-          <a
-            href="https://www.instagram.com/maison.cerya/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="insta-item"
-          >
-            <div class="insta-placeholder"></div>
-          </a>
-          <a
-            href="https://www.instagram.com/maison.cerya/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="insta-item"
-          >
-            <div class="insta-placeholder"></div>
-          </a>
-          <a
-            href="https://www.instagram.com/maison.cerya/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="insta-item"
-          >
-            <div class="insta-placeholder"></div>
-          </a>
-          <a
-            href="https://www.instagram.com/maison.cerya/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="insta-item"
-          >
-            <div class="insta-placeholder"></div>
-          </a>
-        </div>
-        <div class="section-cta">
-          <a
-            href="https://www.instagram.com/maison.cerya/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="btn btn-outline"
-            >Suivre @maison.cerya</a
-          >
-        </div>
-      </div>
-    </section>
-
-    <!-- Newsletter -->
-    <section class="newsletter">
-      <div class="container">
-        <div class="newsletter-content">
-          <h2>Restez Informée</h2>
-          <p>
-            Inscrivez-vous pour recevoir nos nouveautés et offres exclusives.
-          </p>
-          <form class="newsletter-form" id="newsletterForm">
-            <input type="email" placeholder="Votre adresse email" required />
-            <button type="submit" class="btn btn-primary">S'inscrire</button>
-          </form>
-        </div>
       </div>
     </section>
 
@@ -382,9 +238,14 @@
             </ul>
           </div>
           <div class="footer-col">
+            <h4>Collections</h4>
+            <ul class="footer-collections">
+              <li><a href="collections.html">Toutes les collections</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
             <h4>Informations</h4>
             <ul>
-              <li><a href="about.html">Notre Histoire</a></li>
               <li><a href="contact.html">Contact</a></li>
               <li><a href="#">Guide des tailles</a></li>
               <li><a href="#">Politique de retour</a></li>

@@ -15,10 +15,12 @@ Pas besoin de connaissances techniques avancées — tout est expliqué pas à p
 5. [Comprendre le mode démo vs Shopify](#5--comprendre-le-mode-démo-vs-shopify)
 6. [Connecter le site à Shopify (étape par étape)](#6--connecter-le-site-à-shopify-étape-par-étape)
 7. [Gérer vos produits via Shopify](#7--gérer-vos-produits-via-shopify)
-8. [Personnaliser le contenu du site](#8--personnaliser-le-contenu-du-site)
-9. [Ajouter vos images](#9--ajouter-vos-images)
-10. [Mettre le site en ligne](#10--mettre-le-site-en-ligne)
-11. [Questions fréquentes](#11--questions-fréquentes)
+8. [Le système de Collections (via tags Shopify)](#8--le-système-de-collections-via-tags-shopify)
+9. [La navigation Sidebar](#9--la-navigation-sidebar)
+10. [Personnaliser le contenu du site](#10--personnaliser-le-contenu-du-site)
+11. [Ajouter vos images et vidéos](#11--ajouter-vos-images-et-vidéos)
+12. [Mettre le site en ligne](#12--mettre-le-site-en-ligne)
+13. [Questions fréquentes](#13--questions-fréquentes)
 
 ---
 
@@ -26,12 +28,12 @@ Pas besoin de connaissances techniques avancées — tout est expliqué pas à p
 
 C'est le **site web e-commerce** de la marque Maison Cerya. Il permet à vos clientes de :
 
-- Voir vos produits (robes, ensembles, accessoires)
-- Filtrer et trier les produits
+- Découvrir la marque via une **page d'accueil immersive** (vidéo ou image plein écran)
+- Voir vos produits dans la **Boutique** (robes, ensembles, accessoires)
+- Explorer vos **Collections** thématiques (actives et archivées)
+- Filtrer et trier les produits par catégorie
 - Voir le détail d'un produit (photos, tailles, couleurs, description)
-- Ajouter des articles au panier
-- Passer commande (via Shopify)
-- Lire votre histoire de marque
+- Ajouter des articles au panier et passer commande (via Shopify)
 - Vous contacter
 
 Le site est **indépendant** : ce n'est pas un thème Shopify. C'est un site web classique (HTML/CSS/JavaScript) qui **se connecte à Shopify** pour récupérer les produits et gérer les commandes.
@@ -77,13 +79,12 @@ Le site fonctionne en **deux parties** :
 
 ### Ce que Shopify ne contrôle PAS (vous le modifiez dans les fichiers HTML) :
 
-- ❌ Le texte de la page d'accueil (slogan, description)
-- ❌ La barre d'annonce en haut ("Livraison disponible partout en Algérie")
-- ❌ La page "Notre Histoire"
+- ❌ La vidéo/image plein écran de la page d'accueil (landing hero)
+- ❌ La barre d'annonce en haut ("Livraison disponible partout en Algérie") — présente sur toutes les pages sauf l'accueil
+- ❌ Les noms et l'organisation des collections (gérés via les **tags** Shopify, voir section 8)
 - ❌ La page "Contact"
 - ❌ Le design et les couleurs
-- ❌ Les images du héro (bannière), de la page About, et d'Instagram
-- ❌ Les liens des réseaux sociaux
+- ❌ Les liens des réseaux sociaux (Instagram, Facebook, TikTok)
 - ❌ Le formulaire de newsletter
 
 ---
@@ -95,19 +96,20 @@ Voici tous les fichiers du projet et ce qu'ils font :
 ```
 Maison Cerya site/
 │
-├── index.html          ← Page d'accueil
+├── index.html          ← Page d'accueil (landing page immersive)
 ├── shop.html           ← Page boutique (catalogue de tous les produits)
 ├── product.html        ← Page détail d'un produit
-├── about.html          ← Page "Notre Histoire"
+├── collections.html    ← Page des collections thématiques
+├── about.html          ← Page "À propos"
 ├── contact.html        ← Page "Contact"
 │
 ├── css/
 │   └── style.css       ← Tout le design visuel du site
 │
 ├── js/
-│   └── app.js          ← Le cerveau du site (logique, panier, Shopify)
+│   └── app.js          ← Le cerveau du site (logique, panier, Shopify, collections)
 │
-├── images/             ← Vos images (à créer, voir section 9)
+├── images/             ← Vos images (à créer, voir section 11)
 │
 ├── README.md           ← Ce fichier que vous lisez
 └── SHOPIFY-SETUP.md    ← Guide technique Shopify (plus condensé)
@@ -115,34 +117,33 @@ Maison Cerya site/
 
 ### Détail de chaque fichier :
 
-#### 📄 `index.html` — Page d'accueil
+#### 📄 `index.html` — Page d'accueil (Landing Page)
 
-C'est la première page que vos clientes voient. Elle contient :
+C'est la première page que vos clientes voient. C'est une **page immersive minimaliste** qui donne le ton de la marque. Elle contient :
 
-- La **barre d'annonce** noire en haut (ex: "Livraison disponible partout en Algérie")
-- Le **menu de navigation** (Accueil, Boutique, Notre Histoire, Contact)
-- Le **héro** (grande bannière avec le slogan "L'Élégance à l'Algérienne")
-- Les **catégories** (Robes, Ensembles, Accessoires)
-- Les **produits phares** (4 produits mis en avant)
-- La **bannière histoire** ("Tradition & Modernité")
-- Les **nouveautés** (4 derniers produits)
-- Le **feed Instagram** (liens vers votre page Instagram)
-- Le **formulaire newsletter**
-- Le **pied de page** (footer) avec les liens et informations
+- **Pas de barre d'annonce** — contrairement aux autres pages, la page d'accueil est épurée
+- Un **menu de navigation transparent** qui flotte au-dessus du héro (se solidifie au scroll)
+- Un **héro plein écran** (vidéo ou image) avec le nom "MAISON CERYA" et un bouton vers les collections
+- Un indicateur "Défiler" en bas pour inviter à scroller
+- Le **pied de page** (footer)
+
+> 💡 La navbar utilise la classe `navbar--landing` qui la rend transparente avec des icônes blanches. Les autres pages utilisent la navbar standard (fond blanc, icônes noires).
 
 #### 📄 `shop.html` — Page boutique
 
 La page catalogue avec **tous** vos produits. Elle contient :
 
-- Des **filtres** par catégorie (Tout, Robes, Ensembles, Accessoires)
+- La **barre d'annonce** noire en haut
+- Des **filtres** par catégorie (Tout, Robes, Ensembles, Accessoires) — générés dynamiquement depuis Shopify
 - Un **tri** (par prix croissant/décroissant, par nom)
-- La **grille de produits** (4 colonnes sur ordinateur, 2 sur mobile)
+- La **grille de produits** (3 colonnes sur ordinateur, 2 sur mobile)
 - Un bouton "**Ajouter au panier**" qui apparaît au survol de chaque produit
 
 #### 📄 `product.html` — Page détail produit
 
 Quand une cliente clique sur un produit, elle arrive ici. Cette page affiche :
 
+- Un **fil d'Ariane** (Accueil > Boutique > Nom du produit)
 - La **galerie d'images** du produit
 - Le **nom** et le **prix**
 - La **description**
@@ -153,13 +154,23 @@ Quand une cliente clique sur un produit, elle arrive ici. Cette page affiche :
 - Des **onglets** avec : description détaillée, détails du produit, infos livraison
 - Des **produits similaires** en bas
 
-#### 📄 `about.html` — Page Notre Histoire
+#### 📄 `collections.html` — Page Collections
+
+Affiche vos produits organisés par **collections thématiques** (ex: "Collection Printemps 2026"). Le contenu est **entièrement dynamique** — il vient des tags Shopify (voir section 8). Elle contient :
+
+- Un **héro** avec le titre "Collections" et un sous-titre
+- Les **collections actives** — grandes sections éditoriales avec les produits en grille 3 colonnes
+- Les **collections archivées** — section grisée "Collections Précédentes" avec grille plus compacte (4 colonnes)
+- Un message "Aucune collection disponible" si aucun produit n'a de tag collection
+
+#### 📄 `about.html` — Page À propos
 
 Présente votre marque avec :
 
 - Votre **histoire d'origine** (pourquoi et comment la marque a été créée)
 - Votre **vision** (héritage + modernité)
 - Vos **valeurs** (Qualité, Authenticité, Intemporalité)
+- Un bouton "Voir la boutique"
 
 #### 📄 `contact.html` — Page Contact
 
@@ -190,12 +201,14 @@ Les couleurs principales sont définies tout en haut du fichier dans les **varia
 
 C'est le fichier le plus important techniquement. Il gère :
 
-- La **connexion à Shopify** (récupérer les produits, créer des commandes)
+- La **connexion à Shopify** (récupérer les produits via Buy SDK + Storefront GraphQL API pour les tags)
 - Les **produits de démonstration** (affichés quand Shopify n'est pas connecté)
+- Le **système de collections** (parsing des tags `collection:Nom:status`, rendu dynamique sur la page Collections et dans les teasers)
 - Le **panier** (ajouter, supprimer, modifier les quantités)
 - La **sauvegarde du panier** (le panier est sauvegardé même si la cliente ferme le navigateur)
-- Les **filtres et le tri** de la page boutique
-- Le **menu mobile** (hamburger)
+- Les **filtres et le tri** de la page boutique (catégories dynamiques depuis Shopify)
+- La **sidebar de navigation** (ouverture/fermeture, catégories dynamiques)
+- Le **rendu dynamique** des catégories en footer et sidebar
 - La **recherche**
 - Les **animations** au défilement
 - Le **formulaire de contact**
@@ -434,11 +447,113 @@ Une fois connecté, voici votre flux de travail quotidien :
 
 ---
 
-## 8. ✏️ Personnaliser le contenu du site
+## 8. 🏷️ Le système de Collections (via tags Shopify)
+
+Les collections sont un moyen d'organiser vos produits par **thème** ou **saison** (ex: "Collection Printemps 2026", "Ramadan 2026"). Contrairement aux catégories (Robes, Ensembles...) qui organisent par **type de produit**, les collections regroupent des produits de différentes catégories autour d'un **concept**.
+
+### Comment ça fonctionne
+
+Le système utilise les **tags Shopify** avec un format spécial :
+
+```
+collection:Nom de la collection:status
+```
+
+Où **status** est soit `active` soit `archived`.
+
+### Exemples de tags
+
+| Tag Shopify                        | Collection affichée | Statut   |
+| ---------------------------------- | ------------------- | -------- |
+| `collection:Printemps 2026:active` | Printemps 2026      | Active   |
+| `collection:Ramadan 2026:active`   | Ramadan 2026        | Active   |
+| `collection:Été 2025:archived`     | Été 2025            | Archivée |
+
+### Comment ajouter un produit à une collection
+
+1. Dans Shopify Admin → **Produits** → cliquez sur le produit
+2. Dans le champ **Tags** (étiquettes), ajoutez le tag au format ci-dessus
+3. Exemple : pour ajouter une robe à la collection "Printemps 2026", ajoutez le tag : `collection:Printemps 2026:active`
+4. **Sauvegardez** — la collection apparaît automatiquement sur le site
+
+> 💡 Un même produit peut appartenir à **plusieurs collections**. Ajoutez simplement plusieurs tags `collection:...`.
+
+### Où les collections apparaissent
+
+- **Page Collections** (`collections.html`) — Les collections actives sont affichées comme de grandes sections éditoriales. Les archivées apparaissent en bas dans une section grisée "Collections Précédentes"
+- **Footer** — La colonne "Collections" dans le pied de page liste dynamiquement toutes les collections actives
+- **Page d'accueil** (`index.html`) — Si un élément `#collectionsTeaser` est présent, une liste élégante des collections actives s'affiche (liens cliquables vers la page Collections)
+
+### Changer le statut d'une collection
+
+Pour **archiver** une collection (la saison est terminée) :
+
+1. Modifiez le tag de chaque produit concerné : changez `:active` en `:archived`
+2. Exemple : `collection:Printemps 2026:active` → `collection:Printemps 2026:archived`
+3. La collection passe automatiquement de la section principale à la section "Collections Précédentes"
+
+Pour **supprimer** une collection entièrement : retirez simplement les tags `collection:...` des produits.
+
+> ⚠️ **Important** : Shopify met tous les tags en minuscules automatiquement. Le code JavaScript remet la première lettre en majuscule pour l'affichage. Donc `collection:printemps 2026:active` s'affichera comme "Printemps 2026".
+
+### Tags normaux vs tags collection
+
+Les tags qui ne commencent PAS par `collection:` fonctionnent comme avant — ils servent de **badges** sur les produits (ex: "Nouveau", "Best-seller", "Édition limitée"). Seuls les tags au format `collection:...:...` sont interprétés comme des collections.
+
+---
+
+## 9. 📱 La navigation Sidebar
+
+Le site utilise un **panneau de navigation latéral** (sidebar) au lieu d'un menu mobile classique. Ce sidebar s'ouvre quand on clique sur le **hamburger** (≡) en haut à gauche.
+
+### Contenu du sidebar
+
+Le sidebar est divisé en **deux colonnes** :
+
+1. **Liens principaux** (à gauche) — liens vers les pages : Accueil, Boutique, Collections, Contact
+2. **Catégories** (à droite) — liste dynamique des catégories de produits (Robes, Ensembles, etc.) + un lien "Tout voir". Ces catégories sont **générées automatiquement** depuis les types de produits Shopify
+
+### Comportement
+
+- **Hamburger → X** : quand le sidebar est ouvert, les 3 barres se transforment en X avec une animation fluide
+- **Overlay** : un voile semi-transparent couvre le contenu derrière le sidebar. Sur la page d'accueil, l'overlay est un voile chaud frosted glass (verre dépoli) pour adoucir le contraste avec le héro sombre
+- **Logo et icônes masqués** : quand le sidebar est ouvert, le logo et les icônes de recherche/panier disparaissent — seul le bouton X reste visible
+- **Fermeture** : cliquer sur l'overlay, un lien du sidebar, ou le X ferme le panneau
+
+### Modifier les liens du sidebar
+
+Les liens du sidebar sont définis dans **chaque fichier HTML**. Cherchez la section `<!-- Sidebar Navigation -->` :
+
+```html
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<nav class="sidebar-nav" id="sidebarNav">
+  <div class="sidebar-content">
+    <div class="sidebar-col sidebar-main-links">
+      <ul>
+        <li><a href="index.html">Accueil</a></li>
+        <li><a href="shop.html">Boutique</a></li>
+        <li><a href="collections.html">Collections</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-col sidebar-shop-categories">
+      <h4>Catégories</h4>
+      <ul id="sidebarCategories"></ul>
+      <!-- Rempli dynamiquement par JS -->
+    </div>
+  </div>
+</nav>
+```
+
+> ⚠️ Le sidebar est présent dans **chaque** fichier HTML. Si vous ajoutez ou supprimez un lien, faites-le dans les 6 fichiers.
+
+---
+
+## 10. ✏️ Personnaliser le contenu du site
 
 ### Modifier le texte de la barre d'annonce
 
-Ouvrez **n'importe quel fichier HTML** et trouvez :
+La barre d'annonce apparaît en haut de **toutes les pages sauf la page d'accueil** (l'accueil a un design immersif sans barre). Ouvrez un fichier HTML et trouvez :
 
 ```html
 <div class="announcement-bar">
@@ -450,19 +565,37 @@ Ouvrez **n'importe quel fichier HTML** et trouvez :
 
 Changez le texte entre `<p>` et `</p>`.
 
-> ⚠️ La barre d'annonce est présente dans **chaque** fichier HTML. Si vous la modifiez, faites-le dans les 5 fichiers (index.html, shop.html, product.html, about.html, contact.html).
+> ⚠️ La barre d'annonce est présente dans 5 fichiers HTML (tous sauf `index.html`). Si vous la modifiez, faites-le dans les 5 fichiers : `shop.html`, `product.html`, `collections.html`, `about.html`, `contact.html`.
 
-### Modifier le slogan de la page d'accueil
+### Modifier le héro de la page d'accueil
 
 Ouvrez **`index.html`** et cherchez :
 
 ```html
-<h1 class="hero-title fade-up">L'Élégance<br />à l'Algérienne</h1>
+<section class="landing-hero">
+  <div class="landing-hero-media">
+    <!-- Replace with your video: <video autoplay muted loop playsinline><source src="your-video.mp4" type="video/mp4"></video> -->
+    <div class="landing-hero-placeholder"></div>
+  </div>
+  <div class="landing-hero-overlay"></div>
+  <div class="landing-hero-content">
+    <h1 class="fade-up">MAISON CERYA</h1>
+    <a href="collections.html" class="btn btn-outline-light fade-up"
+      >Découvrez notre dernière collection</a
+    >
+  </div>
+</section>
 ```
 
-Modifiez le texte entre les balises.
+- Pour changer le **titre**, modifiez le texte dans `<h1>`
+- Pour changer le **bouton**, modifiez le texte et le `href` du lien
+- Pour ajouter une **vidéo**, voir la section 11
 
-### Modifier le texte de la page "Notre Histoire"
+### Modifier le slogan de la page d'accueil
+
+Ouvrez **`index.html`**, trouvez la ligne `<h1 class="fade-up">MAISON CERYA</h1>` et changez le texte.
+
+### Modifier le texte de la page "À propos"
 
 Ouvrez **`about.html`** et modifiez les paragraphes `<p>` dans la section `about-text`.
 
@@ -477,11 +610,28 @@ Ouvrez **`contact.html`** et modifiez :
 
 ### Modifier les liens des réseaux sociaux
 
-Dans **chaque fichier HTML**, dans le footer, cherchez les liens `<a href="...">` des icônes sociales et remplacez les URLs.
+Dans **chaque fichier HTML**, dans le footer, cherchez les liens `<a href="...">` des icônes sociales (Instagram, Facebook, TikTok) et remplacez les URLs. Le site inclut actuellement trois réseaux :
+
+- **Instagram** — lien vers `https://www.instagram.com/maison.cerya/`
+- **Facebook** — lien placeholder `#` (à remplacer)
+- **TikTok** — lien placeholder `#` (à remplacer)
+
+### Modifier le contenu du footer
+
+Le footer contient **5 colonnes** :
+
+1. **Maison Cerya** — description de la marque + icônes sociales
+2. **Boutique** — liens vers les catégories (remplis dynamiquement par JS)
+3. **Collections** — liens vers les collections actives (remplis dynamiquement par JS)
+4. **Informations** — liens Contact, Guide des tailles, Politique de retour
+5. **Contact** — adresse, email, lien Instagram
+
+Les colonnes Boutique et Collections sont **auto-générées** depuis Shopify. Les colonnes Informations et Contact sont définies en HTML — modifiez-les directement dans chaque fichier.
 
 ### Modifier les couleurs du site
 
-Ouvrez **`css/style.css`** et modifiez les variables en haut :
+11. 🖼️ Ajouter vos images et vidéo
+    Ouvrez **`css/style.css`** et modifiez les variables en haut :
 
 ```css
 :root {
@@ -523,29 +673,39 @@ Actuellement, le logo est en texte ("MAISON CERYA"). Pour le remplacer par une i
 </a>
 ```
 
-### Image du héro (bannière d'accueil)
+### Image du héro (bannière d'accueil) — Vidéo ou Image
 
-1. Placez votre image dans `images/hero.jpg`
-2. Ouvrez **`css/style.css`**, trouvez la section `.hero` et remplacez le fond :
+La page d'accueil prend en charge une **vidéo** ou une **image** en plein écran. Par défaut, un dégradé sombre (placeholder) est affiché.
 
-```css
-.hero {
-  background:
-    linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
-    url("../images/hero.jpg") center/cover no-repeat;
-}
-```
+#### Option A : Ajouter une vidéo (recommandé)
 
-3. Ajoutez `color: white;` aux textes du héro si votre image est foncée.
-
-### Images de la page About
-
-1. Placez vos images dans `images/about-1.jpg` et `images/about-2.jpg`
-2. Dans **`about.html`**, remplacez :
+1. Placez votre vidéo dans `images/hero.mp4` (format MP4, 10-30 secondes, en boucle)
+2. Ouvrez **`index.html`**, trouvez :
 
 ```html
-<div class="about-image"></div>
+<div class="landing-hero-media">
+  <!-- Replace with your video: <video autoplay muted loop playsinline><source src="your-video.mp4" type="video/mp4"></video> -->
+  <div class="landing-hero-placeholder"></div>
+</div>
 ```
+
+3. Remplacez par :
+
+```html
+<div class="landing-hero-media">
+  <video autoplay muted loop playsinline>
+    <source src="images/hero.mp4" type="video/mp4" />
+  </video>
+</div>
+```
+
+> 💡 **Conseils vidéo** : Utilisez une résolution de 1920×1080, compressez à ~5 Mo max pour le chargement rapide. Des sites comme [HandBrake](https://handbrake.fr/) permettent de compresser gratuitement.
+
+#### Option B : Ajouter une image
+
+---
+
+## 12
 
 par :
 
