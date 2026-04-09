@@ -143,7 +143,7 @@
           <a href="shop.html" class="btn btn-primary">Explorer la boutique</a>
         </div>
       </div>
-      <div class="cart-footer" id="cartFooter" style="display: none">
+      <div class="cart-footer" id="cartFooter" hidden>
         <div class="cart-total">
           <span>Total</span>
           <span id="cartTotal">0 DA</span>
@@ -158,18 +158,106 @@
     <section class="landing-hero">
       <div class="landing-hero-media">
         <!-- Replace with your video: <video autoplay muted loop playsinline><source src="your-video.mp4" type="video/mp4"></video> -->
-        <div class="landing-hero-placeholder"></div>
+        <video autoplay muted loop playsinline>
+          <source src="media/Caftan.mp4" type="video/mp4" />
+        </video>
       </div>
       <div class="landing-hero-overlay"></div>
       <div class="landing-hero-content">
+        <span class="landing-kicker fade-up">Vestiaire contemporain</span>
         <h1 class="fade-up">MAISON CERYA</h1>
-        <a href="collections.html" class="btn btn-outline-light fade-up"
-          >Découvrez notre dernière collection</a
-        >
+        <p class="landing-hero-copy fade-up">
+          Des silhouettes raffinées, pensées pour accompagner la femme moderne
+          entre force, douceur et héritage.
+        </p>
+        <div class="landing-hero-actions fade-up">
+          <a href="shop.html" class="btn btn-light">Explorer la boutique</a>
+          <a href="collections.html" class="btn btn-outline-light"
+            >Voir les collections</a
+          >
+        </div>
       </div>
       <div class="hero-scroll">
         <span>Défiler</span>
         <div class="scroll-line"></div>
+      </div>
+    </section>
+
+    <section class="landing-intro section">
+      <div class="container landing-intro-grid">
+        <div class="landing-intro-heading fade-up">
+          <span class="section-tag">Maison Cerya</span>
+          <h2 class="section-title">
+            Une allure éditoriale, pensée pour le quotidien.
+          </h2>
+        </div>
+        <div class="landing-intro-body fade-up">
+          <p>
+            La maison propose un vestiaire féminin au tombé précis, conçu pour
+            traverser les occasions avec la même élégance. Chaque pièce est
+            choisie pour donner rapidement envie d'entrer dans l'univers puis de
+            passer à l'achat sans friction.
+          </p>
+          <div class="landing-intro-actions">
+            <a href="shop.html" class="btn btn-primary">Découvrir les pièces</a>
+            <a href="contact.html" class="btn btn-outline">Prendre contact</a>
+          </div>
+        </div>
+      </div>
+      <div class="container">
+        <div class="landing-value-grid">
+          <article class="landing-value-card fade-up">
+            <span class="landing-value-title">Livraison nationale</span>
+            <p>
+              Expédition disponible partout en Algérie avec accompagnement
+              direct.
+            </p>
+          </article>
+          <article class="landing-value-card fade-up">
+            <span class="landing-value-title">Collections éditées</span>
+            <p>
+              Des sélections construites par univers, pour orienter le choix
+              plus vite.
+            </p>
+          </article>
+          <article class="landing-value-card fade-up">
+            <span class="landing-value-title">Contact humain</span>
+            <p>
+              Instagram et email restent visibles pour rassurer avant la
+              commande.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="collections-teaser">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Collections</span>
+          <h2 class="section-title">Explorez les silhouettes du moment</h2>
+        </div>
+        <div class="collections-teaser-list" id="collectionsTeaser"></div>
+        <div class="section-cta">
+          <a href="collections.html" class="btn btn-outline-light"
+            >Toutes les collections</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <section class="section landing-featured">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Sélection</span>
+          <h2 class="section-title">Pièces à découvrir</h2>
+        </div>
+        <div class="products-grid" id="featuredProducts">
+          <!-- Featured products loaded dynamically via Shopify -->
+        </div>
+        <div class="section-cta">
+          <a href="shop.html" class="btn btn-outline">Voir toute la boutique</a>
+        </div>
       </div>
     </section>
 
@@ -203,7 +291,7 @@
                   <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
                 </svg>
               </a>
-              <a href="#" aria-label="Facebook">
+              <span class="social-link-disabled" aria-hidden="true">
                 <svg
                   width="20"
                   height="20"
@@ -216,8 +304,8 @@
                     d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"
                   />
                 </svg>
-              </a>
-              <a href="#" aria-label="TikTok">
+              </span>
+              <span class="social-link-disabled" aria-hidden="true">
                 <svg
                   width="20"
                   height="20"
@@ -228,7 +316,7 @@
                 >
                   <path d="M9 12a4 4 0 104 4V4a5 5 0 005 5" />
                 </svg>
-              </a>
+              </span>
             </div>
           </div>
           <div class="footer-col">
@@ -247,8 +335,8 @@
             <h4>Informations</h4>
             <ul>
               <li><a href="contact.html">Contact</a></li>
-              <li><a href="#">Guide des tailles</a></li>
-              <li><a href="#">Politique de retour</a></li>
+              <li><a href="guide-tailles.html">Guide des tailles</a></li>
+              <li><a href="retours.html">Politique de retour</a></li>
             </ul>
           </div>
           <div class="footer-col">

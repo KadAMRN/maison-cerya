@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Guide des tailles — Maison Cerya</title>
+    <meta
+      name="description"
+      content="Consultez le guide des tailles Maison Cerya pour choisir la coupe la plus juste avant votre commande."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="announcement-bar">
+      <p>
+        Livraison disponible partout en Algérie — Nouvelle collection disponible
+      </p>
+    </div>
+
+    <nav class="navbar" id="navbar">
+      <div class="nav-container">
+        <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <a href="index.html" class="logo">
+          <span class="logo-text">MAISON CERYA</span>
+        </a>
+
+        <ul class="nav-links" id="navLinks">
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="shop.html">Boutique</a></li>
+          <li><a href="collections.html">Collections</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+
+        <div class="nav-icons">
+          <button
+            class="icon-btn search-btn"
+            id="searchBtn"
+            aria-label="Rechercher"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+          </button>
+          <button class="icon-btn cart-btn" id="cartBtn" aria-label="Panier">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 01-8 0" />
+            </svg>
+            <span class="cart-count" id="cartCount">0</span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <nav class="sidebar-nav" id="sidebarNav">
+      <div class="sidebar-content">
+        <div class="sidebar-col sidebar-main-links">
+          <ul>
+            <li><a href="index.html">Accueil</a></li>
+            <li><a href="shop.html">Boutique</a></li>
+            <li><a href="collections.html">Collections</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div class="sidebar-col sidebar-shop-categories">
+          <h4>Catégories</h4>
+          <ul id="sidebarCategories"></ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="search-overlay" id="searchOverlay">
+      <div class="search-container">
+        <input
+          type="text"
+          placeholder="Rechercher..."
+          id="searchInput"
+          autocomplete="off"
+        />
+        <button class="search-close" id="searchClose" aria-label="Fermer">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="cart-overlay" id="cartOverlay"></div>
+    <div class="cart-sidebar" id="cartSidebar">
+      <div class="cart-header">
+        <h3>Votre Panier</h3>
+        <button class="cart-close" id="cartClose" aria-label="Fermer">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <div class="cart-items" id="cartItems">
+        <div class="cart-empty">
+          <p>Votre panier est vide</p>
+          <a href="shop.html" class="btn btn-primary">Explorer la boutique</a>
+        </div>
+      </div>
+      <div class="cart-footer" id="cartFooter" hidden>
+        <div class="cart-total">
+          <span>Total</span>
+          <span id="cartTotal">0 DA</span>
+        </div>
+        <button class="btn btn-primary btn-full" id="checkoutBtn">
+          Passer la commande
+        </button>
+      </div>
+    </div>
+
+    <section class="page-hero">
+      <div class="container">
+        <h1>Guide des tailles</h1>
+        <p>Choisissez une coupe plus juste des la premiere commande</p>
+      </div>
+    </section>
+
+    <section class="info-page">
+      <div class="container info-page-grid">
+        <aside class="info-page-intro">
+          <span class="section-tag">Conseil</span>
+          <h2>Trouvez votre taille avec plus de serenite.</h2>
+          <p>
+            Si vous hesitez entre deux tailles, prenez en compte le rendu que
+            vous recherchez : plus ajuste ou plus fluide. En cas de doute,
+            notre equipe peut aussi vous orienter par message.
+          </p>
+          <div class="info-note">
+            Les mesures ci-dessous sont donnees a titre indicatif. Selon la
+            coupe ou la matiere, une variation legere peut exister d'une piece
+            a l'autre.
+          </div>
+        </aside>
+
+        <div class="info-page-content">
+          <section class="info-section">
+            <h3>Correspondance des tailles</h3>
+            <div class="size-table-wrapper">
+              <table class="size-table">
+                <thead>
+                  <tr>
+                    <th>Taille</th>
+                    <th>Tour de poitrine</th>
+                    <th>Tour de taille</th>
+                    <th>Tour de hanches</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>XS</td>
+                    <td>80 - 84 cm</td>
+                    <td>60 - 64 cm</td>
+                    <td>86 - 90 cm</td>
+                  </tr>
+                  <tr>
+                    <td>S</td>
+                    <td>84 - 88 cm</td>
+                    <td>64 - 68 cm</td>
+                    <td>90 - 94 cm</td>
+                  </tr>
+                  <tr>
+                    <td>M</td>
+                    <td>88 - 94 cm</td>
+                    <td>68 - 74 cm</td>
+                    <td>94 - 100 cm</td>
+                  </tr>
+                  <tr>
+                    <td>L</td>
+                    <td>94 - 100 cm</td>
+                    <td>74 - 80 cm</td>
+                    <td>100 - 106 cm</td>
+                  </tr>
+                  <tr>
+                    <td>XL</td>
+                    <td>100 - 106 cm</td>
+                    <td>80 - 86 cm</td>
+                    <td>106 - 112 cm</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="info-section">
+            <h3>Comment prendre vos mesures</h3>
+            <ul>
+              <li>Poitrine : mesurez horizontalement au point le plus fort.</li>
+              <li>Taille : mesurez la partie la plus fine du buste.</li>
+              <li>Hanches : mesurez la partie la plus large du bassin.</li>
+              <li>Utilisez un metre souple, sans trop serrer.</li>
+            </ul>
+          </section>
+
+          <section class="info-section">
+            <h3>Entre deux tailles</h3>
+            <p>
+              Si vous recherchez une silhouette plus structuree, prenez la taille
+              la plus proche de vos mesures. Si vous preferez une allure plus
+              fluide, surtout sur les robes ou ensembles amples, la taille au-dessus
+              peut offrir un meilleur confort.
+            </p>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-col footer-brand">
+            <h3 class="footer-logo">MAISON CERYA</h3>
+            <p>
+              L'elegance algerienne au quotidien. Des creations raffinees pour
+              la femme moderne.
+            </p>
+            <div class="social-links">
+              <a
+                href="https://www.instagram.com/maison.cerya/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                  <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" />
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                </svg>
+              </a>
+              <span class="social-link-disabled" aria-hidden="true">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  <path
+                    d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"
+                  />
+                </svg>
+              </span>
+              <span class="social-link-disabled" aria-hidden="true">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  <path d="M9 12a4 4 0 104 4V4a5 5 0 005 5" />
+                </svg>
+              </span>
+            </div>
+          </div>
+          <div class="footer-col">
+            <h4>Boutique</h4>
+            <ul class="footer-categories">
+              <li><a href="shop.html">Toute la collection</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Collections</h4>
+            <ul class="footer-collections">
+              <li><a href="collections.html">Toutes les collections</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Informations</h4>
+            <ul>
+              <li><a href="contact.html">Contact</a></li>
+              <li><a href="guide-tailles.html">Guide des tailles</a></li>
+              <li><a href="retours.html">Politique de retour</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Contact</h4>
+            <ul>
+              <li>Alger, Algerie</li>
+              <li>
+                <a href="mailto:contact@maisoncerya.com"
+                  >contact@maisoncerya.com</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://www.instagram.com/maison.cerya/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >@maison.cerya</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2026 Maison Cerya. Tous droits reserves.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>

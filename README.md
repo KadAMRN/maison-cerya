@@ -313,10 +313,14 @@ C'est l'étape la plus importante ! Dans Shopify :
    - Shopify créera automatiquement des combinaisons (ex: M/Noir, L/Doré...)
    - Vous pouvez définir un stock différent pour chaque combinaison
 
-5. **Organisez en collections** :
-   - Allez dans **Produits** → **Collections**
-   - Créez : "Robes", "Ensembles", "Accessoires", "Nouvelle collection"
-   - Affectez chaque produit à sa collection
+5. **Pour les collections thématiques** (voir section 8 pour le détail) :
+   - Dans le champ **Tags**, ajoutez un tag au format `collection:Nom:active`
+   - Exemple : `collection:Printemps 2026:active`
+   - Le produit apparaîtra automatiquement dans cette collection sur la page Collections
+
+6. **Organisez par type de produit** : Ces valeurs génèrent automatiquement les filtres de la page boutique, les liens du sidebar et les catégories du footer.
+   - Le champ **"Type de produit"** détermine la catégorie (Robes, Ensembles, Accessoires)
+   - Les catégories apparaissent automatiquement dans les filtres, le sidebar et le footer
 
 > ⚠️ **Important** : Le champ **"Type de produit"** doit correspondre aux catégories du site. Utilisez exactement : `Robes`, `Ensembles`, ou `Accessoires` (avec la majuscule).
 
@@ -757,17 +761,43 @@ Pour avoir `maisoncerya.com` au lieu de `random.netlify.app` :
 1. **Achetez un domaine** sur [Namecheap](https://www.namecheap.com/) (environ 10-15$ par an)
    - Cherchez `maisoncerya.com` ou `maisoncerya.dz`
 2. Dans Netlify → **Domain settings** → **Add custom domain**
-3. Suivez les instructions pour pointer le domaine vers Netlify
+3. S3ivez les instructions pour pointer le domaine vers Netlify
 4. Le **HTTPS** (cadenas de sécurité) est activé automatiquement
 
 ### Mettre à jour le site après des modifications
 
-Si vous modifiez un fichier (texte, couleur, etc.) :
+Si vous modifiez un fichier (texte, couleur, etc.) : 6)
 
-1. Connectez-vous à Netlify
-2. Allez dans **Deploys**
-3. Faites glisser de nouveau le dossier complet
-4. Le site est mis à jour en quelques secondes
+- Ouvrez la **console du navigateur** (F12 → onglet Console) pour voir les messages d'erreur. Vous devriez voir `[Maison Cerya] Products loaded: X` si la connexion fonctionne
+
+### "Les produits de démo s'affichent encore"
+
+- Le site est toujours en mode démo. Vérifiez que vous avez bien remplacé `YOUR-STORE.myshopify.com` et `YOUR-TOKEN-HERE` dans `js/app.js`
+
+### "La page Collections est vide"
+
+- Vérifiez que vos produits ont des tags au format `collection:Nom:active` dans Shopify
+- Les tags doivent respecter le format exact : `collection:` + nom + `:active` ou `:archived`
+- Ouvrez la console (F12) et vérifiez que les tags apparaissent : `[Maison Cerya] First product tags: [...]`
+
+### "Comment créer une nouvelle collection ?"
+
+- Ajoutez un tag `collection:Nom de la collection:active` à au moins un produit dans Shopify. La collection apparaîtra automatiquement sur le site. Pas besoin de toucher au code
+
+### "Comment archiver une collection ?"
+
+### "Comment ajouter une page au menu de navigation ?"
+
+- Ajoutez le lien dans la sidebar (`<nav class="sidebar-nav">`) et dans la liste `<ul class="nav-links">` de **chaque fichier HTML**. Modifiez aussi le footer si nécessaire
+
+### "Le sidebar ne montre pas de catégories"
+
+- Les catégories du sidebar sont générées dynamiquement depuis les **types de produits** Shopify. Assurez-vous que vos produits ont un "Type de produit" renseigné (ex: `Robes`, `Ensembles`, `Accessoires`)
+
+### "La page d'accueil affiche un fond noir au lieu d'une vidéo/image"
+
+- C'est normal ! C'est le placeholder par défaut. Remplacez-le par votre vidéo ou image (voir section 11)
+- Modifiez les tags des produits : changez `:active` en `:archived` pour chaque produit de la collection. Les produits passeront de la section principale à "Collections Précédentes"
 
 ---
 
@@ -802,6 +832,30 @@ Si vous modifiez un fichier (texte, couleur, etc.) :
 - Dans Shopify, quand vous modifiez un produit, remplissez le champ **"Prix comparatif"** (Compare at price). Le site affichera l'ancien prix barré à côté du nouveau prix.
 
 ### "Le site est lent"
+
+### 📋 Résumé des pages et navigation
+
+| Page           | Fichier            | URL du nav  | Description                                        |
+| -------------- | ------------------ | ----------- | -------------------------------------------------- |
+| Accueil        | `index.html`       | Accueil     | Landing page immersive (pas de barre d'annonce)    |
+| Boutique       | `shop.html`        | Boutique    | Catalogue avec filtres et tri                      |
+| Collections    | `collections.html` | Collections | Collections thématiques dynamiques (via tags)      |
+| Détail produit | `product.html`     | —           | Fiche produit (pas dans le menu)                   |
+| À propos       | `about.html`       | —           | Histoire de la marque (pas dans le menu principal) |
+| Contact        | `contact.html`     | Contact     | Formulaire de contact                              |
+
+### 📋 Résumé des éléments dynamiques (générés par JS depuis Shopify)
+
+| Élément               | Où il apparaît                           | Source Shopify                 |
+| --------------------- | ---------------------------------------- | ------------------------------ |
+| Filtres catégories    | Page Boutique                            | `Type de produit`              |
+| Catégories sidebar    | Sidebar (toutes pages)                   | `Type de produit`              |
+| Catégories footer     | Footer (toutes pages)                    | `Type de produit`              |
+| Collections actives   | Page Collections, Footer, Teaser accueil | Tags `collection:Nom:active`   |
+| Collections archivées | Page Collections (section "Précédentes") | Tags `collection:Nom:archived` |
+| Badge produit         | Carte produit                            | Premier tag non-collection     |
+
+---
 
 - Optimisez vos images (utilisez [tinypng.com](https://tinypng.com/) pour les réduire)
 - Les images de produits dans Shopify sont optimisées automatiquement
