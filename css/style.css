@@ -2255,6 +2255,19 @@ body.sidebar-open .navbar--landing + .sidebar-overlay.active {
     position: relative;
     left: auto;
     transform: none;
+    max-width: calc(100vw - 140px);
+    overflow: hidden;
+    text-align: center;
+  }
+
+  .logo-text {
+    font-size: 1.2rem;
+    letter-spacing: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    max-width: 100%;
   }
 
   .nav-container {
@@ -2437,8 +2450,8 @@ body.sidebar-open .navbar--landing + .sidebar-overlay.active {
   }
 
   .logo-text {
-    font-size: 1.2rem;
-    letter-spacing: 4px;
+    font-size: 1rem;
+    letter-spacing: 2px;
   }
 
   .hero {
