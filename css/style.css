@@ -750,6 +750,9 @@ body.sidebar-open .navbar--landing + .sidebar-overlay.active {
 
 .search-container input {
   flex: 1;
+  /* Without min-width the input's intrinsic size pushes the close
+     button off-screen on narrow viewports */
+  min-width: 0;
   font-family: var(--font-heading);
   font-size: 2rem;
   border-bottom: 1px solid var(--color-silver);
@@ -757,7 +760,16 @@ body.sidebar-open .navbar--landing + .sidebar-overlay.active {
   background: transparent;
 }
 
+/* Focus cue on the underline itself — an outline ring fights the
+   minimal full-screen design */
+.search-container input:focus-visible {
+  outline: none;
+  border-bottom-color: var(--color-dark);
+}
+
 .search-close {
+  flex-shrink: 0;
+  padding: 8px;
   color: var(--color-gray);
 }
 
@@ -1555,14 +1567,19 @@ body.sidebar-open .navbar--landing + .sidebar-overlay.active {
   color: var(--color-dark);
 }
 
-.filter-btn.active::after {
+.filter-btn::after {
   content: "";
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 100%;
+  width: 0;
   height: 1px;
   background: var(--color-dark);
+  transition: width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.filter-btn.active::after {
+  width: 100%;
 }
 
 .sort-select {
@@ -1880,6 +1897,18 @@ body.sidebar-open .navbar--landing + .sidebar-overlay.active {
 
 .tab-content.active {
   display: block;
+  animation: tabFade 0.35s ease both;
+}
+
+@keyframes tabFade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* --- About Page --- */
@@ -2790,5 +2819,32 @@ textarea:focus-visible {
   .fade-up {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* --- Smooth content switches --- */
+
+/* Crossfade the product grid when filtering or sorting */
+.products-grid {
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease;
+}
+
+.products-grid.grid-fading {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+/* Search overlay on small screens: tighter type so the field and the
+   close button breathe */
+@media (max-width: 768px) {
+  .search-container {
+    gap: 12px;
+    padding: 0 20px;
+  }
+
+  .search-container input {
+    font-size: 1.5rem;
   }
 }
