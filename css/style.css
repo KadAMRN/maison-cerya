@@ -506,8 +506,9 @@ body.sidebar-open .menu-toggle span {
   background: var(--color-dark);
 }
 
-/* Hide logo and icons when sidebar is open — only toggle visible */
+/* Hide logo, links and icons when sidebar is open — only toggle visible */
 body.sidebar-open .logo,
+body.sidebar-open .nav-links,
 body.sidebar-open .nav-icons {
   opacity: 0;
   pointer-events: none;
@@ -2252,12 +2253,14 @@ body.sidebar-open .navbar--landing + .sidebar-overlay.active {
 
 @media (max-width: 768px) {
   .logo {
+    /* In flow next to the burger: clear the 56px absolute toggle */
     position: relative;
     left: auto;
     transform: none;
-    max-width: calc(100vw - 140px);
+    margin-left: 40px;
+    max-width: calc(100vw - 180px);
     overflow: hidden;
-    text-align: center;
+    text-align: left;
   }
 
   .logo-text {
@@ -2670,5 +2673,122 @@ body.sidebar-open .navbar--landing + .sidebar-overlay.active {
   .sidebar-main-links a {
     font-size: 1.2rem;
     padding: 10px 0;
+  }
+}
+
+/* --- UX & Accessibility Polish --- */
+
+/* Keyboard focus (outline is otherwise removed on inputs) */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-warm-dark);
+  outline-offset: 2px;
+}
+
+/* Primary nav links visible on large screens (burger keeps the full menu) */
+@media (min-width: 1200px) {
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    margin-left: 48px;
+  }
+
+  .navbar--landing:not(.scrolled) .nav-links a {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .navbar--landing:not(.scrolled) .nav-links a:hover,
+  .navbar--landing:not(.scrolled) .nav-links a.active {
+    color: var(--color-white);
+  }
+
+  .navbar--landing:not(.scrolled) .nav-links a::after {
+    background: var(--color-white);
+  }
+}
+
+/* Spinner and empty state span the full product grid */
+.products-grid .loading-spinner,
+.coll-products-grid .loading-spinner,
+.products-grid .shop-empty-state,
+.coll-products-grid .shop-empty-state {
+  grid-column: 1 / -1;
+}
+
+/* Sold out products */
+.product-badge--soldout {
+  background: var(--color-white);
+  color: var(--color-dark);
+  border: 1px solid var(--color-silver);
+}
+
+.product-card--soldout .product-image img,
+.product-card--soldout .product-placeholder {
+  opacity: 0.55;
+  filter: grayscale(35%);
+}
+
+.product-quick-add:disabled {
+  color: var(--color-gray);
+  cursor: not-allowed;
+}
+
+.size-btn.disabled,
+.size-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.size-btn.disabled:hover,
+.size-btn:disabled:hover {
+  border-color: var(--color-silver);
+  background: transparent;
+  color: inherit;
+}
+
+.add-to-cart-btn:disabled {
+  background: var(--color-silver);
+  color: var(--color-gray);
+  cursor: not-allowed;
+}
+
+.add-to-cart-btn:disabled:hover {
+  background: var(--color-silver);
+}
+
+#checkoutBtn:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+/* Anchored collection sections land below the fixed header */
+.coll-section,
+.coll-archived-group {
+  scroll-margin-top: calc(
+    var(--header-height) + var(--announcement-height) + 16px
+  );
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  .fade-up {
+    opacity: 1;
+    transform: none;
   }
 }
