@@ -23,109 +23,6 @@
   let cart = [];
 
   // ============================================
-  // DEMO PRODUCTS (commented out — all data comes from Shopify)
-  // Uncomment if you need to test without Shopify connection
-  // ============================================
-  /*
-  const DEMO_PRODUCTS = [
-    {
-      id: 1,
-      title: "Robe Alger",
-      price: "12 500 DA",
-      priceNum: 12500,
-      category: "robes",
-      badge: "Nouveau",
-      description:
-        "Robe élégante inspirée du patrimoine algérien, confectionnée en tissu premium.",
-      sizes: ["XS", "S", "M", "L", "XL"],
-      colors: ["#1a1a1a", "#c9a96e", "#f5f3f0"],
-    },
-    {
-      id: 2,
-      title: "Ensemble Oran",
-      price: "15 800 DA",
-      priceNum: 15800,
-      category: "ensembles",
-      badge: null,
-      description:
-        "Ensemble deux pièces raffiné, coupe moderne et détails traditionnels.",
-      sizes: ["S", "M", "L", "XL"],
-      colors: ["#2d2d2d", "#e8d5b0"],
-    },
-    {
-      id: 3,
-      title: "Robe Constantine",
-      price: "18 000 DA",
-      priceNum: 18000,
-      category: "robes",
-      badge: "Best-seller",
-      description:
-        "Notre pièce signature: robe longue avec broderies subtiles.",
-      sizes: ["XS", "S", "M", "L"],
-      colors: ["#0a0a0a", "#c9a96e", "#8b6f47"],
-    },
-    {
-      id: 4,
-      title: "Foulard Tipaza",
-      price: "3 200 DA",
-      priceNum: 3200,
-      category: "accessoires",
-      badge: null,
-      description: "Foulard en soie douce avec motifs géométriques algériens.",
-      sizes: [],
-      colors: ["#c9a96e", "#f5f3f0", "#1a1a1a"],
-    },
-    {
-      id: 5,
-      title: "Robe Tlemcen",
-      price: "14 200 DA",
-      priceNum: 14200,
-      category: "robes",
-      badge: "Nouveau",
-      description:
-        "Robe fluide aux lignes épurées, parfaite pour les occasions spéciales.",
-      sizes: ["S", "M", "L", "XL"],
-      colors: ["#f5f3f0", "#c9a96e"],
-    },
-    {
-      id: 6,
-      title: "Ensemble Annaba",
-      price: "16 500 DA",
-      priceNum: 16500,
-      category: "ensembles",
-      badge: null,
-      description:
-        "Ensemble chic alliant confort et élégance pour la femme active.",
-      sizes: ["XS", "S", "M", "L", "XL"],
-      colors: ["#2d2d2d", "#6b6b6b"],
-    },
-    {
-      id: 7,
-      title: "Ceinture Djemila",
-      price: "4 800 DA",
-      priceNum: 4800,
-      category: "accessoires",
-      badge: null,
-      description: "Ceinture artisanale en cuir véritable avec boucle dorée.",
-      sizes: ["S", "M", "L"],
-      colors: ["#8b6f47", "#1a1a1a"],
-    },
-    {
-      id: 8,
-      title: "Robe Ghardaïa",
-      price: "19 500 DA",
-      priceNum: 19500,
-      category: "robes",
-      badge: "Édition limitée",
-      description:
-        "Pièce d'exception aux inspirations sahariennes, finitions haute couture.",
-      sizes: ["S", "M", "L"],
-      colors: ["#c9a96e", "#f5f3f0"],
-    },
-  ];
-  */
-
-  // ============================================
   // INITIALIZATION
   // ============================================
   document.addEventListener("DOMContentLoaded", () => {
@@ -136,11 +33,22 @@
     initAnimations();
     initNewsletter();
     initShopify();
-    // Only render immediately if Shopify is not configured (demo mode)
-    if (!shopifyClient) {
+    if (shopifyClient) {
+      showLoadingStates();
+    } else {
       loadPageProducts();
     }
   });
+
+  // Show spinners in product areas while Shopify data loads
+  function showLoadingStates() {
+    ["featuredProducts", "newArrivals", "shopProducts", "collectionsPage"].forEach(
+      function (id) {
+        var el = document.getElementById(id);
+        if (el) el.innerHTML = '<div class="loading-spinner"></div>';
+      },
+    );
+  }
 
   // ============================================
   // SHOPIFY INTEGRATION
@@ -161,9 +69,14 @@
       });
 
       // Create a checkout session
-      shopifyClient.checkout.create().then(function (newCheckout) {
-        checkout = newCheckout;
-      });
+      shopifyClient.checkout
+        .create()
+        .then(function (newCheckout) {
+          checkout = newCheckout;
+        })
+        .catch(function (err) {
+          console.warn("[Maison Cerya] Checkout creation failed:", err);
+        });
 
       // Fetch product tags via direct Storefront API (Buy SDK omits tags)
       function fetchProductTags() {
@@ -202,35 +115,35 @@
       }
 
       // Fetch products + tags in parallel, then merge
-      Promise.all([
-        shopifyClient.product.fetchAll(),
-        fetchProductTags(),
-      ]).then(function (results) {
-        var products = results[0];
-        var tagMap = results[1];
+      Promise.all([shopifyClient.product.fetchAll(250), fetchProductTags()])
+        .then(function (results) {
+          var products = results[0];
+          var tagMap = results[1];
 
-        // Attach tags from GraphQL onto SDK product objects
-        products.forEach(function (p) {
-          if (tagMap[p.id]) {
-            p.tags = tagMap[p.id];
+          // Attach tags from GraphQL onto SDK product objects
+          products.forEach(function (p) {
+            if (tagMap[p.id]) {
+              p.tags = tagMap[p.id];
+            }
+          });
+
+          window.shopifyProducts = products;
+          loadPageProducts();
+          // Re-init product detail if on product page
+          if (
+            typeof window.initProductDetail === "function" &&
+            document.getElementById("productTitle")
+          ) {
+            window.initProductDetail();
           }
+        })
+        .catch(function (err) {
+          // Network / API failure: render empty states instead of
+          // leaving the spinners and "Chargement..." forever
+          console.warn("[Maison Cerya] Product loading failed:", err);
+          window.shopifyProducts = [];
+          loadPageProducts();
         });
-
-        console.log("[Maison Cerya] Products loaded:", products.length);
-        if (products.length > 0) {
-          console.log("[Maison Cerya] First product tags:", products[0].tags);
-        }
-
-        window.shopifyProducts = products;
-        loadPageProducts();
-        // Re-init product detail if on product page
-        if (
-          typeof window.initProductDetail === "function" &&
-          document.getElementById("productTitle")
-        ) {
-          window.initProductDetail();
-        }
-      });
     } catch (e) {
       console.warn("Shopify initialization failed, running in demo mode.", e);
     }
@@ -251,9 +164,21 @@
       : [];
 
     if (featuredGrid) {
-      renderProducts(featuredGrid, products.slice(0, 4));
-      if (!products.length && featuredGrid.closest(".landing-featured")) {
-        featuredGrid.closest(".landing-featured").style.display = "none";
+      var featuredPool = products;
+      // On the product page this grid shows "similar products":
+      // exclude the product currently being viewed
+      if (document.getElementById("productTitle")) {
+        var currentId = new URLSearchParams(window.location.search).get("id");
+        if (currentId) {
+          featuredPool = products.filter(function (p) {
+            return String(p.id) !== String(currentId);
+          });
+        }
+      }
+      renderProducts(featuredGrid, featuredPool.slice(0, 4));
+      var featuredSection = featuredGrid.closest(".landing-featured");
+      if (featuredSection) {
+        featuredSection.style.display = featuredPool.length ? "" : "none";
       }
     }
     if (newArrivalsGrid) {
@@ -298,7 +223,8 @@
   }
 
   function mapShopifyProduct(product) {
-    var variant = product.variants[0];
+    var variants = product.variants || [];
+    var variant = variants.length ? variants[0] : null;
     // Parse collection tags (format: "collection:Name:status")
     var collections = [];
     var regularTags = [];
@@ -328,8 +254,8 @@
     return {
       id: product.id,
       title: product.title,
-      price: formatPrice(variant.price.amount),
-      priceNum: parseFloat(variant.price.amount),
+      price: variant ? formatPrice(variant.price.amount) : "",
+      priceNum: variant ? parseFloat(variant.price.amount) : 0,
       category: product.productType ? product.productType.toLowerCase() : "",
       badge: regularTags.length > 0 ? regularTags[0] : null,
       collections: collections,
@@ -340,7 +266,11 @@
       }),
       handle: product.handle,
       shopifyId: product.id,
-      variantId: variant.id,
+      variantId: variant ? variant.id : null,
+      available: variants.some(function (v) {
+        return v.available !== false;
+      }),
+      hasChoices: variants.length > 1,
       options: product.options
         ? product.options.map(function (opt) {
             return {
@@ -351,7 +281,7 @@
             };
           })
         : [],
-      variants: product.variants.map(function (v) {
+      variants: variants.map(function (v) {
         return {
           id: v.id,
           title: v.title,
@@ -460,7 +390,7 @@
     }
     if (state.category) {
       chips.push(
-        '<span class="shop-state-chip">Categorie: ' +
+        '<span class="shop-state-chip">Catégorie : ' +
           escapeHtml(formatLabel(state.category)) +
           "</span>",
       );
@@ -477,25 +407,25 @@
       '<span class="shop-state-label">' +
       resultCount +
       " " +
-      (resultCount > 1 ? "resultats" : "resultat") +
+      (resultCount > 1 ? "résultats" : "résultat") +
       "</span>" +
       '<div class="shop-state-chips">' +
       chips.join("") +
       "</div>" +
       "</div>" +
-      '<a href="shop.html" class="shop-state-clear">Tout reinitialiser</a>';
+      '<a href="shop.html" class="shop-state-clear">Tout réinitialiser</a>';
     stateEl.classList.add("visible");
   }
 
   function renderShopEmptyState(container) {
     var state = getShopQueryState();
     var title = state.search
-      ? 'Aucun resultat pour "' + escapeHtml(state.search) + '"'
+      ? 'Aucun résultat pour "' + escapeHtml(state.search) + '"'
       : "Aucun produit disponible";
     var copy =
       state.search || state.category
-        ? "Essayez une autre recherche, une autre categorie, ou revenez a toute la boutique."
-        : "La boutique est en cours de mise a jour. Revenez un peu plus tard ou contactez-nous directement.";
+        ? "Essayez une autre recherche, une autre catégorie, ou revenez à toute la boutique."
+        : "La boutique est en cours de mise à jour. Revenez un peu plus tard ou contactez-nous directement.";
 
     container.innerHTML =
       '<div class="shop-empty-state">' +
@@ -524,11 +454,14 @@
 
     container.innerHTML = products
       .map(function (product) {
-        const badgeHTML = product.badge
-          ? '<span class="product-badge">' +
-            escapeHtml(product.badge) +
-            "</span>"
-          : "";
+        const soldOut = product.available === false;
+        const badgeHTML = soldOut
+          ? '<span class="product-badge product-badge--soldout">Épuisé</span>'
+          : product.badge
+            ? '<span class="product-badge">' +
+              escapeHtml(product.badge) +
+              "</span>"
+            : "";
         const imageHTML = product.image
           ? '<img src="' +
             escapeHtml(product.image) +
@@ -538,8 +471,31 @@
           : '<div class="product-placeholder"></div>';
         const productUrl = "product.html?id=" + encodeURIComponent(product.id);
 
+        // Sold out: disabled button. Multiple variants: send the client to
+        // the product page to pick a size instead of silently adding the
+        // first variant. Single variant: direct add to cart.
+        let quickAddHTML;
+        if (soldOut) {
+          quickAddHTML =
+            '<button class="product-quick-add" type="button" disabled>Épuisé</button>';
+        } else if (product.hasChoices) {
+          quickAddHTML =
+            '<button class="product-quick-add" type="button" data-url="' +
+            productUrl +
+            '">Choisir les options</button>';
+        } else {
+          quickAddHTML =
+            '<button class="product-quick-add" type="button" data-id="' +
+            product.id +
+            '" data-variant="' +
+            (product.variantId || product.id) +
+            '">Ajouter au panier</button>';
+        }
+
         return (
-          '<article class="product-card" data-category="' +
+          '<article class="product-card' +
+          (soldOut ? " product-card--soldout" : "") +
+          '" data-category="' +
           escapeHtml(product.category) +
           '">' +
           '<div class="product-image">' +
@@ -551,11 +507,7 @@
           badgeHTML +
           imageHTML +
           "</a>" +
-          '<button class="product-quick-add" type="button" data-id="' +
-          product.id +
-          '" data-variant="' +
-          (product.variantId || product.id) +
-          '">Ajouter au panier</button>' +
+          quickAddHTML +
           "</div>" +
           '<a href="' +
           productUrl +
@@ -579,6 +531,11 @@
       btn.addEventListener("click", function (e) {
         e.preventDefault();
         e.stopPropagation();
+        if (this.disabled) return;
+        if (this.dataset.url) {
+          window.location.href = this.dataset.url;
+          return;
+        }
         addToCart(this.dataset.id, this.dataset.variant);
       });
     });
@@ -647,19 +604,24 @@
     var sortSelect = container.querySelector(".sort-select");
     var sortHTML = sortSelect ? sortSelect.outerHTML : "";
     var html =
-      '<button class="filter-btn active" data-category="all" onclick="filterProducts(null)">Tout</button>';
+      '<button class="filter-btn active" data-category="all">Tout</button>';
     categories.forEach(function (cat) {
       html +=
         '<button class="filter-btn" data-category="' +
         escapeHtml(cat.name) +
-        '" onclick="filterProducts(\'' +
-        escapeHtml(cat.name) +
-        "')\">" +
+        '">' +
         escapeHtml(cat.label) +
         "</button>";
     });
     html += sortHTML;
     container.innerHTML = html;
+
+    container.querySelectorAll(".filter-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var cat = this.dataset.category;
+        window.filterProducts(cat === "all" ? null : cat);
+      });
+    });
   }
 
   function renderFooterCategories(products) {
@@ -736,11 +698,12 @@
     var active = collections.filter(function (c) {
       return c.status === "active";
     });
+    var teaserSection = container.closest(".collections-teaser");
     if (!active.length) {
-      container.closest(".collections-teaser") &&
-        (container.closest(".collections-teaser").style.display = "none");
+      if (teaserSection) teaserSection.style.display = "none";
       return;
     }
+    if (teaserSection) teaserSection.style.display = "";
     container.innerHTML = active
       .map(function (col) {
         return (
@@ -849,6 +812,17 @@
         renderProducts(grid, col.products);
       }
     });
+
+    // Content is injected after page load, so honor #anchor links
+    // (from the homepage teaser or the footer) once it exists
+    if (window.location.hash) {
+      var target = document.getElementById(
+        decodeURIComponent(window.location.hash.slice(1)),
+      );
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
   }
 
   function renderFooterCollections(products) {
@@ -912,7 +886,8 @@
     });
   }
 
-  function addToCart(productId, specificVariantId) {
+  function addToCart(productId, specificVariantId, quantity) {
+    var qty = Math.max(1, parseInt(quantity, 10) || 1);
     var products = window.shopifyProducts
       ? window.shopifyProducts.map(mapShopifyProduct)
       : [];
@@ -943,7 +918,7 @@
       return String(item.variantId) === String(variantId);
     });
     if (existing) {
-      existing.qty += 1;
+      existing.qty += qty;
     } else {
       cart.push({
         id: product.id,
@@ -953,7 +928,7 @@
         price: price,
         priceNum: priceNum,
         image: product.image || null,
-        qty: 1,
+        qty: qty,
       });
     }
 
@@ -1079,7 +1054,6 @@
 
   function handleCheckout() {
     if (shopifyClient && checkout) {
-      // Add items to Shopify checkout
       var lineItems = cart
         .map(function (item) {
           return { variantId: item.variantId, quantity: item.qty };
@@ -1089,10 +1063,39 @@
         });
 
       if (lineItems.length > 0) {
-        shopifyClient.checkout
-          .addLineItems(checkout.id, lineItems)
+        var btn = document.getElementById("checkoutBtn");
+        if (btn) {
+          btn.disabled = true;
+          btn.textContent = "Redirection...";
+        }
+
+        // A completed checkout can't be reused; create a fresh one.
+        // replaceLineItems (not add) keeps retried checkouts from
+        // accumulating duplicate items.
+        var ensureCheckout = checkout.completedAt
+          ? shopifyClient.checkout.create().then(function (c) {
+              checkout = c;
+              return c;
+            })
+          : Promise.resolve(checkout);
+
+        ensureCheckout
+          .then(function (c) {
+            return shopifyClient.checkout.replaceLineItems(c.id, lineItems);
+          })
           .then(function (updatedCheckout) {
+            checkout = updatedCheckout;
             window.location.href = updatedCheckout.webUrl;
+          })
+          .catch(function (err) {
+            console.warn("[Maison Cerya] Checkout failed:", err);
+            if (btn) {
+              btn.disabled = false;
+              btn.textContent = "Passer la commande";
+            }
+            alert(
+              "Une erreur est survenue lors de la commande. Réessayez dans un instant, ou contactez-nous sur Instagram @maison.cerya.",
+            );
           });
         return;
       }
@@ -1139,6 +1142,7 @@
 
     function openSidebar() {
       toggle.classList.add("active");
+      toggle.setAttribute("aria-expanded", "true");
       sidebar.classList.add("active");
       if (overlay) overlay.classList.add("active");
       document.body.classList.add("sidebar-open");
@@ -1147,6 +1151,7 @@
 
     function closeSidebar() {
       toggle.classList.remove("active");
+      toggle.setAttribute("aria-expanded", "false");
       sidebar.classList.remove("active");
       if (overlay) overlay.classList.remove("active");
       document.body.classList.remove("sidebar-open");
@@ -1190,10 +1195,13 @@
 
     function closeSearch() {
       searchOverlay.classList.remove("active");
+      document.body.style.overflow = "";
+      searchBtn.focus();
     }
 
     searchBtn.addEventListener("click", function () {
       searchOverlay.classList.add("active");
+      document.body.style.overflow = "hidden";
       if (searchInput) {
         searchInput.value = getShopQueryState().search || "";
       }
@@ -1365,6 +1373,7 @@
     if (priceEl) priceEl.textContent = product.price;
     if (descEl) descEl.innerHTML = product.description;
     if (breadcrumb) breadcrumb.textContent = product.title;
+    document.title = product.title + " — Maison Cerya";
 
     // Gallery image
     var mainImage = document.getElementById("mainImage");
@@ -1460,9 +1469,28 @@
           })
           .join("");
 
+        // Disable option values that are sold out in every variant
+        optionsContainer.querySelectorAll(".size-btn").forEach(function (btn) {
+          var anyAvailable = (product.variants || []).some(function (v) {
+            return (
+              v.available !== false &&
+              v.selectedOptions.some(function (o) {
+                return (
+                  o.name === btn.dataset.option && o.value === btn.dataset.value
+                );
+              })
+            );
+          });
+          if ((product.variants || []).length && !anyAvailable) {
+            btn.classList.add("disabled");
+            btn.disabled = true;
+          }
+        });
+
         // Click handlers for option buttons
         optionsContainer.querySelectorAll(".size-btn").forEach(function (btn) {
           btn.addEventListener("click", function () {
+            if (this.disabled) return;
             // Deselect siblings in the same option group
             this.parentElement
               .querySelectorAll(".size-btn")
@@ -1474,6 +1502,26 @@
             updateSelectedVariant(product, optionsContainer);
           });
         });
+
+        // Preselect the first available variant so the price, the add
+        // button and the selected options are coherent from the start
+        var defaultVariant =
+          (product.variants || []).find(function (v) {
+            return v.available !== false;
+          }) || (product.variants || [])[0];
+        if (defaultVariant && defaultVariant.selectedOptions) {
+          optionsContainer
+            .querySelectorAll(".size-btn")
+            .forEach(function (btn) {
+              var matches = defaultVariant.selectedOptions.some(function (o) {
+                return (
+                  o.name === btn.dataset.option && o.value === btn.dataset.value
+                );
+              });
+              if (matches) btn.classList.add("active");
+            });
+          updateSelectedVariant(product, optionsContainer);
+        }
       }
     }
 
@@ -1497,14 +1545,14 @@
     // Add to cart (variant-aware)
     var addBtn = document.getElementById("addToCartDetail");
     if (addBtn) {
-      addBtn.dataset.variantId = product.variantId || product.id;
+      if (!addBtn.dataset.variantId) {
+        addBtn.dataset.variantId = product.variantId || product.id;
+      }
       addBtn.addEventListener("click", function () {
-        var qty = parseInt(qtyInput ? qtyInput.value : 1) || 1;
-        var variantId = this.dataset.variantId;
-        for (var i = 0; i < qty; i++) {
-          addToCart(product.id, variantId);
-        }
+        var qty = parseInt(qtyInput ? qtyInput.value : "1", 10) || 1;
+        addToCart(product.id, this.dataset.variantId, qty);
       });
+      syncAddToCartState(product, addBtn);
     }
 
     // Description tab
@@ -1550,8 +1598,25 @@
       var priceEl = document.getElementById("productPrice");
       if (priceEl) priceEl.textContent = match.price;
       var addBtn = document.getElementById("addToCartDetail");
-      if (addBtn) addBtn.dataset.variantId = match.id;
+      if (addBtn) {
+        addBtn.dataset.variantId = match.id;
+        syncAddToCartState(product, addBtn);
+      }
     }
+  }
+
+  // Enable/disable the detail-page add button based on the
+  // availability of the currently selected variant
+  function syncAddToCartState(product, addBtn) {
+    var variants = product.variants || [];
+    var selected = variants.find(function (v) {
+      return String(v.id) === String(addBtn.dataset.variantId);
+    });
+    var soldOut = selected
+      ? selected.available === false
+      : product.available === false;
+    addBtn.disabled = soldOut;
+    addBtn.textContent = soldOut ? "Épuisé" : "Ajouter au panier";
   }
 
   // ============================================
@@ -1578,11 +1643,15 @@
   // ============================================
   // UTILITY
   // ============================================
+  // Escapes quotes too — values are injected into HTML attributes
   function escapeHtml(text) {
-    if (!text) return "";
-    var div = document.createElement("div");
-    div.appendChild(document.createTextNode(String(text)));
-    return div.innerHTML;
+    if (text === null || text === undefined || text === "") return "";
+    return String(text)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
   }
 
   function stripHtml(text) {
