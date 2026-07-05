@@ -1283,6 +1283,19 @@
   // ============================================
   // SHOP PAGE FILTERS
   // ============================================
+
+  // Fade the grid out, swap its content, fade it back in — keeps
+  // filter/sort switches from feeling abrupt
+  function swapGridContent(grid, render) {
+    grid.classList.add("grid-fading");
+    window.setTimeout(function () {
+      render();
+      requestAnimationFrame(function () {
+        grid.classList.remove("grid-fading");
+      });
+    }, 220);
+  }
+
   window.filterProducts = function (category) {
     var params = new URLSearchParams(window.location.search);
 
@@ -1322,9 +1335,11 @@
 
     var shopGrid = document.getElementById("shopProducts");
     if (shopGrid) {
-      renderProducts(shopGrid, filtered);
-      updateShopCount(filtered.length);
-      renderShopState(getShopQueryState(), filtered.length);
+      swapGridContent(shopGrid, function () {
+        renderProducts(shopGrid, filtered);
+        updateShopCount(filtered.length);
+        renderShopState(getShopQueryState(), filtered.length);
+      });
     }
   };
 
@@ -1339,9 +1354,11 @@
     products = applyShopState(products, getShopQueryState());
     products = sortProductsList(products, sortBy);
 
-    renderProducts(shopGrid, products);
-    updateShopCount(products.length);
-    renderShopState(getShopQueryState(), products.length);
+    swapGridContent(shopGrid, function () {
+      renderProducts(shopGrid, products);
+      updateShopCount(products.length);
+      renderShopState(getShopQueryState(), products.length);
+    });
   };
 
   // ============================================
